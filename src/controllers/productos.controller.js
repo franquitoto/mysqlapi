@@ -25,14 +25,13 @@ export const obtenerProducto = async (req, res) =>{
 
 export const crearProducto = async (req, res) => {
   try {
-    console.log(req.body)
     const idUnico = nanoid(10);
     const nombreArchivo = req.file.filename;
     
     const rutaArchivo = req.file.path;
-    console.log(rutaArchivo)
-    const urlImg =  `http://localhost:3000/${rutaArchivo.slice(47, 86)}`;
-    console.log(`http://localhost:3000/${rutaArchivo.slice(54, 86)}`)
+    const urlImg =`http://localhost:3000/img/${rutaArchivo.slice(48 , 86)}`
+    // const urlImg =  `http://localhost:3000/img${rutaArchivo.slice(48, 86)}`;
+    console.log(`http://localhost:3000/img/${rutaArchivo.slice(54, 86)}`)
     const nombreImg = nombreArchivo;
     const pathImg = rutaArchivo.slice(49, 70)
     const {
@@ -66,8 +65,28 @@ export const crearProducto = async (req, res) => {
       ]
     );
     console.log([rows], "aca debe ir algo");
-    res.json({ mensaje: "creando productos" });
+    res.json({
+      nombre,
+      urlImg,
+      id
+    });
   } catch (error) {
     res.status(404).json({mensaje:error.message});
   }
+};
+
+export const eliminarProducto = async (req, res) =>{
+  try {
+    const id = req.params = req.params.id;
+
+    const [rows] = await pool.query('DELETE FROM productos WHERE id = ?',[id]);
+    console.log(rows);
+    console.log(rows[0]);
+    if (rows.affectedRows === 0) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    res.json('producto eliminado correctamente');
+    
+  } catch (error) {
+    res.status(404).json({error});    
+  }
+  
 };
