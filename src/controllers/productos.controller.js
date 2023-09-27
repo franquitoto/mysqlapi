@@ -11,6 +11,18 @@ export const obtenerProductos = async(req, res) =>{
   }
 }
 
+export const obtenerProducto = async (req, res) =>{
+  try {
+    const id = req.params.id;
+    const [rows] = await pool.query('SELECT * FROM productos WHERE id = ?', [id])
+    console.log([rows]);
+    res.json(rows[0])
+  } catch (error) {
+    res.json(error)
+  }
+  
+}
+
 export const crearProducto = async (req, res) => {
   try {
     console.log(req.body)
