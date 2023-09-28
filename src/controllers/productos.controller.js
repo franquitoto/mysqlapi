@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 export const obtenerProductos = async(req, res) =>{
   try {
     const rows = await pool.query('SELECT * FROM productos'); 
-    console.log(rows[0])
     res.json({Productos:rows[0]});
   } catch (error) {
     res.json(error);
@@ -29,10 +28,10 @@ export const crearProducto = async (req, res) => {
     const nombreArchivo = req.file.filename;
     
     const rutaArchivo = req.file.path;
-    const urlImg =`http://localhost:3000/img/${rutaArchivo.slice(48 , 86)}`
-    // const urlImg =  `http://localhost:3000/img${rutaArchivo.slice(48, 86)}`;
-    console.log(`http://localhost:3000/img/${rutaArchivo.slice(54, 86)}`)
+    // const urlImg =`http://localhost:3000/${rutaArchivo.slice(48 , 86)}`
     const nombreImg = nombreArchivo;
+    console.log(`http://localhost:3000/img/${nombreImg}`);
+    const urlImg =  `http://localhost:3000/img/${nombreImg}`;
     const pathImg = rutaArchivo.slice(49, 70)
     const {
       nombre,
@@ -64,13 +63,17 @@ export const crearProducto = async (req, res) => {
         destacado,
       ]
     );
-    console.log([rows], "aca debe ir algo");
-    res.json({
-      nombre,
-      urlImg,
-      id
-    });
+    if (rows.affectedRows === 1)  {
+      console.log('ok')
+      return res.json({
+        nombre,
+        urlImg,
+        idUnico 
+      });
+    } 
+    console.log('no entro al if');
   } catch (error) {
+    console.log('hubo un error', error);
     res.status(404).json({mensaje:error.message});
   }
 };
@@ -89,4 +92,17 @@ export const eliminarProducto = async (req, res) =>{
     res.status(404).json({error});    
   }
   
+};
+
+export const obtenerFiltros = async (req, res) => {
+  const filtro = req.params.filtro;
+  console.log(filtro, 'filtro')
+  const sqlQuery = `SELECT DISTINCT ${filtro} FROM productos`;
+
+  try {
+    const [rows] = await pool.query(sqlQuery);
+    res.json(rows);
+  } catch (error) {
+    res.status(404).json(error);
+  }
 };
